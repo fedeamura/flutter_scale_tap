@@ -110,29 +110,39 @@ class _ScaleTapState extends State<ScaleTap> with SingleTickerProviderStateMixin
     return _onTapUp(_);
   }
 
+  Widget _container({Widget child}) {
+    if (widget.onTap != null || widget.onLongPress != null) {
+      return Listener(
+        onPointerDown: _onTapDown,
+        onPointerCancel: _onTapCancel,
+        onPointerUp: _onTapUp,
+        child: GestureDetector(
+          onTap: widget.onTap,
+          onLongPress: widget.onLongPress,
+          child: child,
+        ),
+      );
+    }
+
+    return child;
+  }
+
   @override
   Widget build(BuildContext context) {
-    return Listener(
-      onPointerDown: _onTapDown,
-      onPointerCancel: _onTapCancel,
-      onPointerUp: _onTapUp,
-      child: GestureDetector(
-        onTap: widget.onTap,
-        onLongPress: widget.onLongPress,
-        child: AnimatedBuilder(
-          animation: _animationController,
-          builder: (_, Widget child) {
-            return Opacity(
-              opacity: _opacity.value,
-              child: Transform.scale(
-                alignment: Alignment.center,
-                scale: _scale.value,
-                child: child,
-              ),
-            );
-          },
-          child: widget.child,
-        ),
+    return _container(
+      child: AnimatedBuilder(
+        animation: _animationController,
+        builder: (_, Widget child) {
+          return Opacity(
+            opacity: _opacity.value,
+            child: Transform.scale(
+              alignment: Alignment.center,
+              scale: _scale.value,
+              child: child,
+            ),
+          );
+        },
+        child: widget.child,
       ),
     );
   }
