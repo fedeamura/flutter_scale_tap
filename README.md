@@ -1,6 +1,6 @@
 # ScaleTap
 
-Scale/opacity button gesture detector
+Scale and opacity animated Button for Flutter
 
 ## Getting Started
 
@@ -22,7 +22,7 @@ ScaleTap(
 
 ## Parameters
 
-ScaleTap
+### ScaleTap
 
 | Parameter name | Type | Description | Required | Default value |
 |---|---|---|---|---|
