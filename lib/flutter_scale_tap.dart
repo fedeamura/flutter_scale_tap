@@ -4,13 +4,13 @@ import 'package:flutter/physics.dart';
 import 'package:flutter/widgets.dart';
 
 class ScaleTap extends StatefulWidget {
-  final Function() onTap;
-  final Function() onLongPress;
-  final Widget child;
+  final Function()? onTap;
+  final Function()? onLongPress;
+  final Widget? child;
   final Duration duration;
   final double scaleMinValue;
-  final Curve scaleCurve;
-  final Curve opacityCurve;
+  final Curve? scaleCurve;
+  final Curve? opacityCurve;
   final double opacityMinValue;
 
   ScaleTap({
@@ -28,10 +28,11 @@ class ScaleTap extends StatefulWidget {
   _ScaleTapState createState() => _ScaleTapState();
 }
 
-class _ScaleTapState extends State<ScaleTap> with SingleTickerProviderStateMixin {
-  AnimationController _animationController;
-  Animation<double> _scale;
-  Animation<double> _opacity;
+class _ScaleTapState extends State<ScaleTap>
+    with SingleTickerProviderStateMixin {
+  AnimationController? _animationController;
+  Animation<double>? _scale;
+  Animation<double>? _opacity;
 
   @override
   void initState() {
@@ -43,11 +44,11 @@ class _ScaleTapState extends State<ScaleTap> with SingleTickerProviderStateMixin
     _scale = Tween<double>(
       begin: 1.0,
       end: 1.0,
-    ).animate(_animationController);
+    ).animate(_animationController!);
     _opacity = Tween<double>(
       begin: 1.0,
       end: 1.0,
-    ).animate(_animationController);
+    ).animate(_animationController!);
   }
 
   @override
@@ -65,32 +66,36 @@ class _ScaleTapState extends State<ScaleTap> with SingleTickerProviderStateMixin
   }
 
   Duration get _computedDuration {
-    return widget.duration ?? Duration(milliseconds: 300);
+    return widget.duration;
   }
 
-  Future<void> anim({double scale, double opacity, Duration duration}) {
+  void anim({
+    required double scale,
+    required double opacity,
+    required Duration duration,
+  }) {
     _animationController?.stop();
-    _animationController.duration = duration ?? Duration.zero;
+    _animationController?.duration = duration;
 
     _scale = Tween<double>(
-      begin: _scale.value,
+      begin: _scale!.value,
       end: scale,
     ).animate(CurvedAnimation(
       curve: _computedScaleCurve,
-      parent: _animationController,
+      parent: _animationController!,
     ));
     _opacity = Tween<double>(
-      begin: _opacity.value,
+      begin: _opacity!.value,
       end: opacity,
     ).animate(CurvedAnimation(
       curve: _computedOpacityCurve,
-      parent: _animationController,
+      parent: _animationController!,
     ));
     _animationController?.reset();
-    return _animationController?.forward();
+    _animationController?.forward();
   }
 
-  Future<void> _onTapDown(_) {
+  void _onTapDown(_) {
     return anim(
       scale: widget.scaleMinValue,
       opacity: widget.opacityMinValue,
@@ -98,7 +103,7 @@ class _ScaleTapState extends State<ScaleTap> with SingleTickerProviderStateMixin
     );
   }
 
-  Future<void> _onTapUp(_) {
+  void _onTapUp(_) {
     return anim(
       scale: 1.0,
       opacity: 1.0,
@@ -106,11 +111,11 @@ class _ScaleTapState extends State<ScaleTap> with SingleTickerProviderStateMixin
     );
   }
 
-  Future<void> _onTapCancel(_) {
+  void _onTapCancel(_) {
     return _onTapUp(_);
   }
 
-  Widget _container({Widget child}) {
+  Widget _container({required Widget child}) {
     if (widget.onTap != null || widget.onLongPress != null) {
       return Listener(
         onPointerDown: _onTapDown,
@@ -131,13 +136,13 @@ class _ScaleTapState extends State<ScaleTap> with SingleTickerProviderStateMixin
   Widget build(BuildContext context) {
     return _container(
       child: AnimatedBuilder(
-        animation: _animationController,
-        builder: (_, Widget child) {
+        animation: _animationController!,
+        builder: (_, child) {
           return Opacity(
-            opacity: _opacity.value,
+            opacity: _opacity!.value,
             child: Transform.scale(
               alignment: Alignment.center,
-              scale: _scale.value,
+              scale: _scale!.value,
               child: child,
             ),
           );

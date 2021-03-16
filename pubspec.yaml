@@ -1,11 +1,11 @@
 name: flutter_scale_tap
 description: Scale and opacity animated Button for Flutter
 version: 1.0.0
-author: Federico Amura
+author: Linh The Ngo
 homepage:
 
 environment:
-  sdk: ">=2.7.0 <3.0.0"
+  sdk: ">=2.12.0 <3.0.0"
 
 dependencies:
   flutter:
