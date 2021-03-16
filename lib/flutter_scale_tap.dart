@@ -30,9 +30,9 @@ class ScaleTap extends StatefulWidget {
 
 class _ScaleTapState extends State<ScaleTap>
     with SingleTickerProviderStateMixin {
-  late final AnimationController _animationController;
-  late final Animation<double> _scale;
-  late final Animation<double> _opacity;
+  AnimationController? _animationController;
+  Animation<double>? _scale;
+  Animation<double>? _opacity;
 
   @override
   void initState() {
@@ -44,16 +44,16 @@ class _ScaleTapState extends State<ScaleTap>
     _scale = Tween<double>(
       begin: 1.0,
       end: 1.0,
-    ).animate(_animationController);
+    ).animate(_animationController!);
     _opacity = Tween<double>(
       begin: 1.0,
       end: 1.0,
-    ).animate(_animationController);
+    ).animate(_animationController!);
   }
 
   @override
   void dispose() {
-    _animationController.dispose();
+    _animationController?.dispose();
     super.dispose();
   }
 
@@ -69,33 +69,33 @@ class _ScaleTapState extends State<ScaleTap>
     return widget.duration;
   }
 
-  Future<void> anim({
+  void anim({
     required double scale,
     required double opacity,
     required Duration duration,
   }) {
-    _animationController.stop();
-    _animationController.duration = duration;
+    _animationController?.stop();
+    _animationController?.duration = duration;
 
     _scale = Tween<double>(
-      begin: _scale.value,
+      begin: _scale!.value,
       end: scale,
     ).animate(CurvedAnimation(
       curve: _computedScaleCurve,
-      parent: _animationController,
+      parent: _animationController!,
     ));
     _opacity = Tween<double>(
-      begin: _opacity.value,
+      begin: _opacity!.value,
       end: opacity,
     ).animate(CurvedAnimation(
       curve: _computedOpacityCurve,
-      parent: _animationController,
+      parent: _animationController!,
     ));
-    _animationController.reset();
-    return _animationController.forward();
+    _animationController?.reset();
+    _animationController?.forward();
   }
 
-  Future<void> _onTapDown(_) {
+  void _onTapDown(_) {
     return anim(
       scale: widget.scaleMinValue,
       opacity: widget.opacityMinValue,
@@ -103,7 +103,7 @@ class _ScaleTapState extends State<ScaleTap>
     );
   }
 
-  Future<void> _onTapUp(_) {
+  void _onTapUp(_) {
     return anim(
       scale: 1.0,
       opacity: 1.0,
@@ -111,7 +111,7 @@ class _ScaleTapState extends State<ScaleTap>
     );
   }
 
-  Future<void> _onTapCancel(_) {
+  void _onTapCancel(_) {
     return _onTapUp(_);
   }
 
@@ -136,13 +136,13 @@ class _ScaleTapState extends State<ScaleTap>
   Widget build(BuildContext context) {
     return _container(
       child: AnimatedBuilder(
-        animation: _animationController,
+        animation: _animationController!,
         builder: (_, child) {
           return Opacity(
-            opacity: _opacity.value,
+            opacity: _opacity!.value,
             child: Transform.scale(
               alignment: Alignment.center,
-              scale: _scale.value,
+              scale: _scale!.value,
               child: child,
             ),
           );
