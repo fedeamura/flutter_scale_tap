@@ -3,6 +3,11 @@ library flutter_scale_tap;
 import 'package:flutter/physics.dart';
 import 'package:flutter/widgets.dart';
 
+class ScaleTapConfig {
+  static double scaleMinValue = 0.95;
+  static double opacityMinValue = 0.90;
+}
+
 class ScaleTap extends StatefulWidget {
   final Function() onTap;
   final Function() onLongPress;
@@ -18,8 +23,8 @@ class ScaleTap extends StatefulWidget {
     this.onLongPress,
     this.child,
     this.duration = const Duration(milliseconds: 300),
-    this.scaleMinValue = 0.95,
-    this.opacityMinValue = 0.9,
+    this.scaleMinValue,
+    this.opacityMinValue,
     this.scaleCurve,
     this.opacityCurve,
   });
@@ -92,8 +97,8 @@ class _ScaleTapState extends State<ScaleTap> with SingleTickerProviderStateMixin
 
   Future<void> _onTapDown(_) {
     return anim(
-      scale: widget.scaleMinValue,
-      opacity: widget.opacityMinValue,
+      scale: widget.scaleMinValue ?? ScaleTapConfig.scaleMinValue,
+      opacity: widget.opacityMinValue ?? ScaleTapConfig.opacityMinValue,
       duration: _computedDuration,
     );
   }
@@ -110,39 +115,31 @@ class _ScaleTapState extends State<ScaleTap> with SingleTickerProviderStateMixin
     return _onTapUp(_);
   }
 
-  Widget _container({Widget child}) {
-    if (widget.onTap != null || widget.onLongPress != null) {
-      return Listener(
-        onPointerDown: _onTapDown,
+  @override
+  Widget build(BuildContext context) {
+    final bool isTapEnabled = widget.onTap != null || widget.onLongPress != null;
+
+    return AnimatedBuilder(
+      animation: _animationController,
+      builder: (_, Widget child) {
+        return Opacity(
+          opacity: _opacity.value,
+          child: Transform.scale(
+            alignment: Alignment.center,
+            scale: _scale.value,
+            child: child,
+          ),
+        );
+      },
+      child: Listener(
+        onPointerDown: isTapEnabled ? _onTapDown : null,
         onPointerCancel: _onTapCancel,
         onPointerUp: _onTapUp,
         child: GestureDetector(
-          onTap: widget.onTap,
-          onLongPress: widget.onLongPress,
-          child: child,
+          onTap: isTapEnabled ? widget.onTap : null,
+          onLongPress: isTapEnabled ? widget.onLongPress : null,
+          child: widget.child,
         ),
-      );
-    }
-
-    return child;
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return _container(
-      child: AnimatedBuilder(
-        animation: _animationController,
-        builder: (_, Widget child) {
-          return Opacity(
-            opacity: _opacity.value,
-            child: Transform.scale(
-              alignment: Alignment.center,
-              scale: _scale.value,
-              child: child,
-            ),
-          );
-        },
-        child: widget.child,
       ),
     );
   }
