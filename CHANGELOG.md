@@ -1,4 +1,7 @@
-## [1.0.1] - 05/05/2020
+## [1.0.2] - 11/05/2021
+* Migrate to RawMaterialButton
+
+## [1.0.1] - 05/05/2021
 * Global parameter for scale and opacity min value
 * Bug fixes
 
