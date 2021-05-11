@@ -1,84 +1,44 @@
 library flutter_scale_tap;
 
-import 'package:flutter/material.dart';
 import 'package:flutter/physics.dart';
-import 'package:flutter/rendering.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 
+const double _DEFAULT_SCALE_MIN_VALUE = 0.95;
+const double _DEFAULT_OPACITY_MIN_VALUE = 0.90;
+final Curve _DEFAULT_SCALE_CURVE = CurveSpring(); // ignore: non_constant_identifier_names
+const Curve _DEFAULT_OPACITY_CURVE = Curves.ease;
+const Duration _DEFAULT_DURATION = Duration(milliseconds: 300);
+
 class ScaleTapConfig {
-  static double scaleMinValue = 0.95;
-  static Curve scaleCurve = CurveSpring();
-  static double opacityMinValue = 0.90;
-  static Curve opacityCurve = Curves.ease;
-  static Duration scaleOpacityAnimationDuration = const Duration(milliseconds: 300);
-  static Duration buttonAnimationDuration = const Duration(milliseconds: 300);
+  static double scaleMinValue;
+  static Curve scaleCurve;
+  static double opacityMinValue;
+  static Curve opacityCurve;
+  static Duration duration;
 }
 
 class ScaleTap extends StatefulWidget {
   final Function() onPressed;
   final Function() onLongPress;
   final Widget child;
-  final Duration scaleOpacityAnimationDuration;
-  final Duration buttonAnimationDuration;
+  final Duration duration;
   final double scaleMinValue;
   final Curve scaleCurve;
   final Curve opacityCurve;
   final double opacityMinValue;
-  final VisualDensity visualDensity;
-  final TextStyle textStyle;
-  final MouseCursor mouseCursor;
-  final bool autofocus;
-  final FocusNode focusNode;
   final bool enableFeedback;
-  final Clip clipBehavior;
-  final Color fillColor;
-  final EdgeInsets padding;
-  final ShapeBorder shape;
-  final MaterialTapTargetSize materialTapTargetSize;
-  final BoxConstraints constraints;
-  final double elevation;
-  final Color focusColor;
-  final double focusElevation;
-  final Color highlightColor;
-  final double highlightElevation;
-  final double hoverElevation;
-  final Color hoverColor;
-  final double disabledElevation;
-  final ValueChanged<bool> onHighlightChanged;
-  final Color splashColor;
 
   ScaleTap({
+    this.enableFeedback = true,
     this.onPressed,
     this.onLongPress,
     this.child,
+    this.duration,
     this.scaleMinValue,
     this.opacityMinValue,
     this.scaleCurve,
     this.opacityCurve,
-    this.visualDensity,
-    this.textStyle,
-    this.mouseCursor,
-    this.autofocus = false,
-    this.focusNode,
-    this.enableFeedback = true,
-    this.clipBehavior,
-    this.scaleOpacityAnimationDuration,
-    this.buttonAnimationDuration,
-    this.fillColor,
-    this.focusColor,
-    this.padding,
-    this.shape,
-    this.materialTapTargetSize,
-    this.constraints,
-    this.focusElevation,
-    this.elevation,
-    this.disabledElevation,
-    this.highlightColor,
-    this.hoverElevation,
-    this.hoverColor,
-    this.highlightElevation,
-    this.onHighlightChanged,
-    this.splashColor,
   });
 
   @override
@@ -94,39 +54,15 @@ class _ScaleTapState extends State<ScaleTap> with SingleTickerProviderStateMixin
   void initState() {
     super.initState();
 
-    _animationController = AnimationController(
-      vsync: this,
-    );
-    _scale = Tween<double>(
-      begin: 1.0,
-      end: 1.0,
-    ).animate(_animationController);
-    _opacity = Tween<double>(
-      begin: 1.0,
-      end: 1.0,
-    ).animate(_animationController);
+    _animationController = AnimationController(vsync: this);
+    _scale = Tween<double>(begin: 1.0, end: 1.0).animate(_animationController);
+    _opacity = Tween<double>(begin: 1.0, end: 1.0).animate(_animationController);
   }
 
   @override
   void dispose() {
     _animationController?.dispose();
     super.dispose();
-  }
-
-  Curve get _computedScaleCurve {
-    return widget.scaleCurve ?? ScaleTapConfig.scaleCurve ?? CurveSpring();
-  }
-
-  Curve get _computedOpacityCurve {
-    return widget.opacityCurve ?? ScaleTapConfig.opacityCurve ?? Curves.ease;
-  }
-
-  Duration get _computedScaleOpacityAnimationDuration {
-    return widget.scaleOpacityAnimationDuration ?? ScaleTapConfig.scaleOpacityAnimationDuration ?? Duration.zero;
-  }
-
-  Duration get _computedButtonAnimationDuration {
-    return widget.buttonAnimationDuration ?? ScaleTapConfig.buttonAnimationDuration ?? Duration.zero;
   }
 
   Future<void> anim({double scale, double opacity, Duration duration}) {
@@ -137,14 +73,14 @@ class _ScaleTapState extends State<ScaleTap> with SingleTickerProviderStateMixin
       begin: _scale.value,
       end: scale,
     ).animate(CurvedAnimation(
-      curve: _computedScaleCurve,
+      curve: widget.scaleCurve ?? ScaleTapConfig.scaleCurve ?? _DEFAULT_SCALE_CURVE,
       parent: _animationController,
     ));
     _opacity = Tween<double>(
       begin: _opacity.value,
       end: opacity,
     ).animate(CurvedAnimation(
-      curve: _computedOpacityCurve,
+      curve: widget.opacityCurve ?? ScaleTapConfig.opacityCurve ?? _DEFAULT_OPACITY_CURVE,
       parent: _animationController,
     ));
     _animationController?.reset();
@@ -153,9 +89,9 @@ class _ScaleTapState extends State<ScaleTap> with SingleTickerProviderStateMixin
 
   Future<void> _onTapDown(_) {
     return anim(
-      scale: widget.scaleMinValue ?? ScaleTapConfig.scaleMinValue,
-      opacity: widget.opacityMinValue ?? ScaleTapConfig.opacityMinValue,
-      duration: _computedScaleOpacityAnimationDuration,
+      scale: widget.scaleMinValue ?? ScaleTapConfig.scaleMinValue ?? _DEFAULT_SCALE_MIN_VALUE,
+      opacity: widget.opacityMinValue ?? ScaleTapConfig.opacityMinValue ?? _DEFAULT_OPACITY_MIN_VALUE,
+      duration: widget.duration ?? ScaleTapConfig.duration ?? _DEFAULT_DURATION,
     );
   }
 
@@ -163,7 +99,7 @@ class _ScaleTapState extends State<ScaleTap> with SingleTickerProviderStateMixin
     return anim(
       scale: 1.0,
       opacity: 1.0,
-      duration: _computedScaleOpacityAnimationDuration,
+      duration: widget.duration ?? ScaleTapConfig.duration ?? _DEFAULT_DURATION,
     );
   }
 
@@ -191,33 +127,17 @@ class _ScaleTapState extends State<ScaleTap> with SingleTickerProviderStateMixin
         onPointerDown: isTapEnabled ? _onTapDown : null,
         onPointerCancel: _onTapCancel,
         onPointerUp: _onTapUp,
-        child: RawMaterialButton(
-          padding: widget.padding ?? EdgeInsets.zero,
-          shape: widget.shape,
-          materialTapTargetSize: widget.materialTapTargetSize ?? MaterialTapTargetSize.shrinkWrap,
-          clipBehavior: widget.clipBehavior ?? Clip.none,
-          constraints: widget.constraints ?? BoxConstraints(),
-          animationDuration: _computedButtonAnimationDuration,
-          fillColor: widget.fillColor ?? Colors.transparent,
-          focusColor: widget.focusColor ?? Colors.transparent,
-          focusElevation: widget.focusElevation ?? 0.0,
-          elevation: widget.elevation ?? 0.0,
-          highlightColor: widget.highlightColor ?? Colors.transparent,
-          highlightElevation: widget.highlightElevation ?? 0.00,
-          hoverElevation: widget.hoverElevation ?? 0.0,
-          hoverColor: widget.hoverColor ?? Colors.transparent,
-          splashColor: widget.splashColor ?? Colors.transparent,
-          onPressed: isTapEnabled ? widget.onPressed : null,
+        child: GestureDetector(
+          onTap: isTapEnabled
+              ? () {
+                  if (widget.enableFeedback) {
+                    SystemSound.play(SystemSoundType.click);
+                  }
+                  widget.onPressed?.call();
+                }
+              : null,
           onLongPress: isTapEnabled ? widget.onLongPress : null,
-          autofocus: widget.autofocus,
-          focusNode: widget.focusNode,
-          enableFeedback: widget.enableFeedback,
-          mouseCursor: widget.mouseCursor,
-          textStyle: widget.textStyle,
-          visualDensity: widget.visualDensity,
-          disabledElevation: widget.disabledElevation ?? 0.0,
           child: widget.child,
-          onHighlightChanged: widget.onHighlightChanged,
         ),
       ),
     );

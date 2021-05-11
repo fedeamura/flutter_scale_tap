@@ -1,3 +1,11 @@
+## [1.0.4] - 11/05/2021
+* Rollback.
+* Better personalization
+* Sound on click
+
+## [1.0.3] - 11/05/2021
+* Hot fix
+
 ## [1.0.2] - 11/05/2021
 * Migrate to RawMaterialButton
 
