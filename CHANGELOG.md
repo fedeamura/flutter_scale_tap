@@ -1,3 +1,6 @@
+## [1.0.5] - 04/06/2021
+* Null safety
+
 ## [1.0.4] - 11/05/2021
 * Rollback.
 * Better personalization

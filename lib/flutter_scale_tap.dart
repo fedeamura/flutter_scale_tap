@@ -11,29 +11,29 @@ const Curve _DEFAULT_OPACITY_CURVE = Curves.ease;
 const Duration _DEFAULT_DURATION = Duration(milliseconds: 300);
 
 class ScaleTapConfig {
-  static double scaleMinValue;
-  static Curve scaleCurve;
-  static double opacityMinValue;
-  static Curve opacityCurve;
-  static Duration duration;
+  static double? scaleMinValue;
+  static Curve? scaleCurve;
+  static double? opacityMinValue;
+  static Curve? opacityCurve;
+  static Duration? duration;
 }
 
 class ScaleTap extends StatefulWidget {
-  final Function() onPressed;
-  final Function() onLongPress;
-  final Widget child;
-  final Duration duration;
-  final double scaleMinValue;
-  final Curve scaleCurve;
-  final Curve opacityCurve;
-  final double opacityMinValue;
+  final Function()? onPressed;
+  final Function()? onLongPress;
+  final Widget? child;
+  final Duration? duration;
+  final double? scaleMinValue;
+  final Curve? scaleCurve;
+  final Curve? opacityCurve;
+  final double? opacityMinValue;
   final bool enableFeedback;
 
   ScaleTap({
     this.enableFeedback = true,
     this.onPressed,
     this.onLongPress,
-    this.child,
+    required this.child,
     this.duration,
     this.scaleMinValue,
     this.opacityMinValue,
@@ -46,9 +46,9 @@ class ScaleTap extends StatefulWidget {
 }
 
 class _ScaleTapState extends State<ScaleTap> with SingleTickerProviderStateMixin {
-  AnimationController _animationController;
-  Animation<double> _scale;
-  Animation<double> _opacity;
+  late AnimationController _animationController;
+  late Animation<double> _scale;
+  late Animation<double> _opacity;
 
   @override
   void initState() {
@@ -61,12 +61,12 @@ class _ScaleTapState extends State<ScaleTap> with SingleTickerProviderStateMixin
 
   @override
   void dispose() {
-    _animationController?.dispose();
+    _animationController.dispose();
     super.dispose();
   }
 
-  Future<void> anim({double scale, double opacity, Duration duration}) {
-    _animationController?.stop();
+  Future<void> anim({double? scale, double? opacity, Duration? duration}) {
+    _animationController.stop();
     _animationController.duration = duration ?? Duration.zero;
 
     _scale = Tween<double>(
@@ -83,8 +83,8 @@ class _ScaleTapState extends State<ScaleTap> with SingleTickerProviderStateMixin
       curve: widget.opacityCurve ?? ScaleTapConfig.opacityCurve ?? _DEFAULT_OPACITY_CURVE,
       parent: _animationController,
     ));
-    _animationController?.reset();
-    return _animationController?.forward();
+    _animationController.reset();
+    return _animationController.forward();
   }
 
   Future<void> _onTapDown(_) {
@@ -113,7 +113,7 @@ class _ScaleTapState extends State<ScaleTap> with SingleTickerProviderStateMixin
 
     return AnimatedBuilder(
       animation: _animationController,
-      builder: (_, Widget child) {
+      builder: (_, Widget? child) {
         return Opacity(
           opacity: _opacity.value,
           child: Transform.scale(
