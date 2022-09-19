@@ -1,3 +1,6 @@
+## Unreleased
+* fixes #2: 'Nested ScaleTap widget animates both ScaleTap widgets' - 19/09/2022
+
 ## [1.0.5] - 04/06/2021
 * Null safety
 
