@@ -6,7 +6,8 @@ import 'package:flutter/widgets.dart';
 
 const double _DEFAULT_SCALE_MIN_VALUE = 0.95;
 const double _DEFAULT_OPACITY_MIN_VALUE = 0.90;
-final Curve _DEFAULT_SCALE_CURVE = CurveSpring(); // ignore: non_constant_identifier_names
+// ignore: non_constant_identifier_names
+final Curve _DEFAULT_SCALE_CURVE = CurveSpring();
 const Curve _DEFAULT_OPACITY_CURVE = Curves.ease;
 const Duration _DEFAULT_DURATION = Duration(milliseconds: 300);
 
@@ -18,7 +19,20 @@ class ScaleTapConfig {
   static Duration? duration;
 }
 
+class ScaleTapInfo {
+  ScaleTapInfo({
+    required this.tag,
+    this.consumed = false,
+  });
+
+  final String tag;
+  bool consumed;
+
+  static final _default = ScaleTapInfo(tag: "default");
+}
+
 class ScaleTap extends StatefulWidget {
+  final ScaleTapInfo? info;
   final Function()? onPressed;
   final Function()? onLongPress;
   final Widget? child;
@@ -29,7 +43,9 @@ class ScaleTap extends StatefulWidget {
   final double? opacityMinValue;
   final bool enableFeedback;
 
-  ScaleTap({
+  const ScaleTap({
+    Key? key,
+    this.info,
     this.enableFeedback = true,
     this.onPressed,
     this.onLongPress,
@@ -39,16 +55,18 @@ class ScaleTap extends StatefulWidget {
     this.opacityMinValue,
     this.scaleCurve,
     this.opacityCurve,
-  });
+  }) : super(key: key);
 
   @override
-  _ScaleTapState createState() => _ScaleTapState();
+  State<ScaleTap> createState() => _ScaleTapState();
 }
 
 class _ScaleTapState extends State<ScaleTap> with SingleTickerProviderStateMixin {
   late AnimationController _animationController;
   late Animation<double> _scale;
   late Animation<double> _opacity;
+
+  ScaleTapInfo get _info => widget.info ?? ScaleTapInfo._default;
 
   @override
   void initState() {
@@ -88,6 +106,9 @@ class _ScaleTapState extends State<ScaleTap> with SingleTickerProviderStateMixin
   }
 
   Future<void> _onTapDown(_) {
+    if (_info.consumed == true) return Future.value();
+    _info.consumed = true;
+
     return anim(
       scale: widget.scaleMinValue ?? ScaleTapConfig.scaleMinValue ?? _DEFAULT_SCALE_MIN_VALUE,
       opacity: widget.opacityMinValue ?? ScaleTapConfig.opacityMinValue ?? _DEFAULT_OPACITY_MIN_VALUE,
@@ -96,6 +117,8 @@ class _ScaleTapState extends State<ScaleTap> with SingleTickerProviderStateMixin
   }
 
   Future<void> _onTapUp(_) {
+    _info.consumed = false;
+
     return anim(
       scale: 1.0,
       opacity: 1.0,
